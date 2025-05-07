@@ -26,8 +26,8 @@
     }
     .container {
       position: relative;
-      width: 800px;  /* 크기 확대 */
-      height: 800px; /* 크기 확대 */
+      width: 800px;
+      height: 800px;
       margin: auto;
     }
     button {
@@ -42,7 +42,7 @@
 <body>
   <div class="container">
     <div class="pointer"></div>
-    <canvas id="roulette" width="800" height="800"></canvas> <!-- 크기 확대 -->
+    <canvas id="roulette" width="800" height="800"></canvas>
   </div>
   <button id="actionBtn" onclick="toggleSpinReset()">돌리기</button>
 
@@ -51,19 +51,17 @@
     const ctx = canvas.getContext('2d');
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const radius = 300;  // 반지름 두 배 확대
+    const radius = 300;
 
-    // 룰렛 항목들
     const items = [
-      '스타벅스 쿠폰',       // 초록
-      '주유권',             // 흰
-      '스타벅스 쿠폰',       // 초록
-      '아웃백 외식상품권',   // 흰
-      '스타벅스 쿠폰',       // 초록
-      '아웃백 외식상품권'    // 흰
+      '스타벅스 쿠폰',
+      '주유권',
+      '스타벅스 쿠폰',
+      '아웃백 외식상품권',
+      '스타벅스 쿠폰',
+      '아웃백 외식상품권'
     ];
 
-    // 흰색 칸 인덱스 (초록색이 아닌 칸들)
     const whiteIndexes = [1, 3, 5];
     let isSpinning = false;
 
@@ -82,14 +80,14 @@
         ctx.stroke();
 
         const textAngle = startAngle + angleStep / 2;
-        const textX = centerX + Math.cos(textAngle) * (radius - 80);  // 텍스트 위치 더 안쪽으로 조정
+        const textX = centerX + Math.cos(textAngle) * (radius - 80);
         const textY = centerY + Math.sin(textAngle) * (radius - 80);
 
         ctx.save();
         ctx.translate(textX, textY);
         ctx.rotate(textAngle);
         ctx.fillStyle = whiteIndexes.includes(i) ? 'black' : 'white';
-        ctx.font = 'bold 16px sans-serif';  // 텍스트 크기 키우기
+        ctx.font = 'bold 16px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(items[i], 0, 0);
         ctx.restore();
@@ -98,48 +96,39 @@
 
     function spin() {
       if (isSpinning) return;
-
       isSpinning = true;
 
-      // 흰색 칸 중 하나를 무작위로 선택
       const chosenIndex = whiteIndexes[Math.floor(Math.random() * whiteIndexes.length)];
-
       const anglePerItem = 360 / items.length;
-      const baseRotation = 360 * 5; // 최소 5바퀴를 돌게 설정
+      const baseRotation = 360 * 5;
       const offset = anglePerItem * chosenIndex;
       const pointerOffset = anglePerItem / 2;
-      const correction = 90; // 3시 기준 → 12시 보정
-
-      // 회전 값을 흰색 칸에 맞추기 위해 finalRotation을 계산
+      const correction = 90;
       const finalRotation = baseRotation - (offset + pointerOffset) + correction;
 
-      // 회전 애니메이션을 위한 CSS 애니메이션을 설정합니다.
-      canvas.style.transition = 'transform 3s ease-out'; // 애니메이션 추가
+      canvas.style.transition = 'transform 3s ease-out';
       canvas.style.transform = `rotate(${finalRotation}deg)`;
 
-      // 버튼 텍스트 변경
       const btn = document.getElementById('actionBtn');
       btn.innerText = '리셋';
-      btn.onclick = resetRoulette;  // 리셋 이벤트 새로 설정
+      btn.onclick = resetRoulette;
     }
 
     function resetRoulette() {
       isSpinning = false;
 
-      // 회전 애니메이션을 리셋하기 전에 잠시 기다렸다가 애니메이션을 끝낸 후 룰렛을 새로 그리기
-      canvas.style.transition = 'transform 0.5s ease-out'; // 짧은 애니메이션 설정
-      canvas.style.transform = 'rotate(0deg)';  // 룰렛을 초기 위치로 돌림
+      canvas.style.transition = 'transform 0.5s ease-out';
+      canvas.style.transform = 'rotate(0deg)';
 
-      // 애니메이션이 끝난 후 룰렛을 새로 그리기
       setTimeout(() => {
-        canvas.style.transition = 'none';  // 애니메이션 없애고 바로 그리기
-        drawRoulette();  // 룰렛을 다시 그려서 초기화
+        canvas.style.transition = 'none';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);  // 🎯 이 부분이 핵심
+        drawRoulette();
 
-        // 버튼 텍스트 변경
         const btn = document.getElementById('actionBtn');
-        btn.innerText = '돌리기';  // 텍스트를 "돌리기"로 바꿔줌
-        btn.onclick = spin;  // "돌리기" 버튼이 다시 동작하도록 설정
-      }, 500);  // 500ms 후에 새로 그리도록 설정
+        btn.innerText = '돌리기';
+        btn.onclick = spin;
+      }, 500);
     }
 
     function toggleSpinReset() {
